@@ -10,18 +10,20 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float normalJumpForce = 10f;
     [SerializeField] private float specialJumpForce = 14f;
     [SerializeField] private int maxSpecialJumps = 3;
+    [SerializeField] private bool allowSpecialJumpInAir = false;
 
     [Header("Detección de suelo")]
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundCheckRadius = 0.2f;
     [SerializeField] private LayerMask groundLayer;
 
-    [Header("Estado (solo lectura en runtime)")]
+    [Header("Estado (runtime)")]
     [SerializeField] private bool isGrounded;
     [SerializeField] private int specialJumpsRemaining;
 
     private Rigidbody2D rb;
     private float moveInput;
+    private bool wasGrounded;
 
     private void Awake()
     {
@@ -34,7 +36,7 @@ public class PlayerMovement : MonoBehaviour
         moveInput = Input.GetAxisRaw("Horizontal");
         CheckGrounded();
 
-        if (isGrounded)
+        if (isGrounded && !wasGrounded)
         {
             specialJumpsRemaining = maxSpecialJumps;
         }
@@ -42,13 +44,18 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             Jump(normalJumpForce);
+            isGrounded = false;
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftShift) && specialJumpsRemaining > 0)
+        bool canUseSpecialJump = specialJumpsRemaining > 0 && (isGrounded || allowSpecialJumpInAir);
+        if (Input.GetKeyDown(KeyCode.LeftShift) && canUseSpecialJump)
         {
             Jump(specialJumpForce);
             specialJumpsRemaining--;
+            isGrounded = false;
         }
+
+        wasGrounded = isGrounded;
     }
 
     private void FixedUpdate()
