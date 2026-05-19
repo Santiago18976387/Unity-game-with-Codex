@@ -6,6 +6,18 @@ public class OstiasMovement : MonoBehaviour
 
     private void Update()
     {
+        float horizontalInput = 0f;
+        float verticalInput = 0f;
+
+        if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            horizontalInput = -1f;
+        }
+        else if (Input.GetKey(KeyCode.RightArrow))
+        {
+            horizontalInput = 1f;
+        }
+
         float verticalInput = 0f;
 
         if (Input.GetKey(KeyCode.UpArrow))
@@ -17,6 +29,7 @@ public class OstiasMovement : MonoBehaviour
             verticalInput = -1f;
         }
 
+        Vector3 movement = new Vector3(horizontalInput, verticalInput, 0f) * (speed * Time.deltaTime);
         Vector3 movement = Vector3.up * (verticalInput * speed * Time.deltaTime);
         transform.Translate(movement);
     }
